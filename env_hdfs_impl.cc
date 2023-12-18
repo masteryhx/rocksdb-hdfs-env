@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <sys/time.h>
+#include <string>
 #include "logging/logging.h"
 #include "rocksdb/status.h"
 #include "util/string_util.h"
@@ -515,6 +517,8 @@ IOStatus HdfsFileSystem::NewDirectory(const std::string& name,
 IOStatus HdfsFileSystem::FileExists(const std::string& fname,
                                         const IOOptions& /*options*/,
                                         IODebugContext* /*dbg*/) {
+  ROCKS_LOG_INFO(mylog, "path: %s", fname.c_str());
+  printf("path: %s", fname.c_str());
   int value = hdfsExists(fileSys_, fname.c_str());
   switch (value) {
     case HDFS_EXISTS:
@@ -524,7 +528,7 @@ IOStatus HdfsFileSystem::FileExists(const std::string& fname,
     default:  // anything else should be an error
       ROCKS_LOG_FATAL(mylog, "FileExists hdfsExists call failed");
       return IOStatus::IOError("hdfsExists call failed with error " +
-                               ROCKSDB_NAMESPACE::ToString(value) + " on path " + fname + ".\n");
+                               std::to_string(value) + " on path " + fname + ".\n");
   }
 }
 
