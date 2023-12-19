@@ -518,7 +518,6 @@ IOStatus HdfsFileSystem::FileExists(const std::string& fname,
                                         const IOOptions& /*options*/,
                                         IODebugContext* /*dbg*/) {
   ROCKS_LOG_INFO(mylog, "path: %s", fname.c_str());
-  printf("path: %s", fname.c_str());
   int value = hdfsExists(fileSys_, fname.c_str());
   switch (value) {
     case HDFS_EXISTS:
@@ -708,7 +707,7 @@ Status HdfsFileSystem::Create(const std::shared_ptr<FileSystem>& base, const std
     if (colon == std::string::npos || colon == uri.size() - 1) {
       return Status::InvalidArgument("Bad host-port for hdfs ", uri);
     } else {
-      std::string host = uri.substr(start, colon);
+      std::string host = uri.substr(start, colon - start);
       std::string rest = uri.substr(colon+1);
       auto slash = rest.find('/');
       if (slash != std::string::npos) {

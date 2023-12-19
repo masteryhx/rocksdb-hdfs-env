@@ -9,14 +9,14 @@
 #include <jni.h>
 #include <vector>
 
-#include "portal.h"
-#include "env_hdfs.h"
+#include "java/rocksjni/portal.h"
+#include "plugin/hdfs/env_hdfs.h"
 #include "rocksdb/env.h"
-#include "include/org_rocksdb_Env.h"
-#include "include/org_rocksdb_HdfsEnv.h"
-#include "include/org_rocksdb_RocksEnv.h"
-#include "include/org_rocksdb_RocksMemEnv.h"
-#include "include/org_rocksdb_TimedEnv.h"
+#include "java/include/org_rocksdb_Env.h"
+#include "java/include/org_rocksdb_HdfsEnv.h"
+#include "java/include/org_rocksdb_RocksEnv.h"
+#include "java/include/org_rocksdb_RocksMemEnv.h"
+#include "java/include/org_rocksdb_TimedEnv.h"
 
 /*
  * Class:     org_rocksdb_HdfsEnv

@@ -11,4 +11,5 @@ set(hdfs_LINK_PATHS "$ENV{JAVA_HOME}/jre/lib/amd64/server" "$ENV{JAVA_HOME}/jre/
 set(hdfs_CMAKE_EXE_LINKER_FLAGS "-u hdfs_reg" PARENT_SCOPE)
 set(hdfs_JNI_NATIVE_SOURCES "java/rocksjni/env_hdfs.cc")
 set(hdfs_NATIVE_JAVA_CLASSES "org.rocksdb.HdfsEnv")
-set(hdfs_JAVA_TESTS org.rocksdb.HdfsEnvTest)
+set(hdfs_JAVA_TESTS "org.rocksdb.HdfsEnvTest")
+set(hdfs_FUNC "register_HdfsObjects")
