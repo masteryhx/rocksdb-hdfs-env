@@ -456,10 +456,14 @@ Status HdfsFileSystem::ValidateOptions(const DBOptions& db_opts,
   
 // open a file for sequential reading
 IOStatus HdfsFileSystem::NewSequentialFile(const std::string& fname,
-                                               const FileOptions& /*options*/,
+                                               const FileOptions& options,
                                                std::unique_ptr<FSSequentialFile>* result,
-                                               IODebugContext* /*dbg*/) {
+                                               IODebugContext* dbg) {
   result->reset();
+  IOStatus status = FileExists(fname, IOOptions(), dbg);
+  if (!status.ok()) {
+    return status;
+  }
   HdfsReadableFile* f = new HdfsReadableFile(fileSys_, fname);
   if (f == nullptr || !f->isValid()) {
     delete f;
@@ -472,10 +476,14 @@ IOStatus HdfsFileSystem::NewSequentialFile(const std::string& fname,
 
 // open a file for random reading
 IOStatus HdfsFileSystem::NewRandomAccessFile(const std::string& fname,
-                                                 const FileOptions& /*options*/,
+                                                 const FileOptions& options,
                                                  std::unique_ptr<FSRandomAccessFile>* result,
-                                                 IODebugContext* /*dbg*/) {
+                                                 IODebugContext* dbg) {
   result->reset();
+  IOStatus status = FileExists(fname, IOOptions(), dbg);
+  if (!status.ok()) {
+    return status;
+  }
   HdfsReadableFile* f = new HdfsReadableFile(fileSys_, fname);
   if (f == nullptr || !f->isValid()) {
     delete f;
@@ -561,8 +569,12 @@ IOStatus HdfsFileSystem::GetChildren(const std::string& path,
 }
 
 IOStatus HdfsFileSystem::DeleteFile(const std::string& fname,
-                                        const IOOptions& /*options*/,
-                                        IODebugContext* /*dbg*/) {
+                                        const IOOptions& options,
+                                        IODebugContext* dbg) {
+  IOStatus status = FileExists(fname, options, dbg);
+  if (status.IsNotFound()) {
+    return IOStatus::PathNotFound();
+  }
   if (hdfsDelete(fileSys_, fname.c_str(), 1) == 0) {
     return IOStatus::OK();
   }
@@ -627,7 +639,11 @@ IOStatus HdfsFileSystem::GetFileModificationTime(const std::string& fname,
 // target already exists. So, we delete the target before attempting the
 // rename.
 IOStatus HdfsFileSystem::RenameFile(const std::string& src, const std::string& target,
-                                        const IOOptions& /*options*/, IODebugContext* /*dbg*/) {
+                                        const IOOptions& options, IODebugContext* dbg) {
+  IOStatus srcStatus = FileExists(src, options, dbg);
+  if (srcStatus.IsNotFound()) {
+    return IOStatus::PathNotFound();
+  }
   hdfsDelete(fileSys_, target.c_str(), 1);
   if (hdfsRename(fileSys_, src.c_str(), target.c_str()) == 0) {
     return IOStatus::OK();
@@ -639,7 +655,8 @@ IOStatus HdfsFileSystem::LockFile(const std::string& /*fname*/,
                                       const IOOptions& /*options*/,
                                       FileLock** lock,
                                       IODebugContext* /*dbg*/) {
-  // there isn's a very good way to atomically check and create
+  // TODO
+  // there isn't a very good way to atomically check and create
   // a file via libhdfs
   *lock = nullptr;
   return IOStatus::OK();
